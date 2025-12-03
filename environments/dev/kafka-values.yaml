@@ -1,0 +1,5 @@
+# Dev Environment Kafka Overrides
+kafka:
+  replicaCount: 1
+  persistence:
+    size: 5Gi

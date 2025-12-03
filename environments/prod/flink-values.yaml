@@ -1,0 +1,6 @@
+# Prod Environment Flink Overrides
+flink:
+  jobmanager:
+    replicaCount: 2
+    highAvailability:
+      enabled: true

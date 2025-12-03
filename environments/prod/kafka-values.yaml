@@ -1,0 +1,8 @@
+# Prod Environment Kafka Overrides (High Availability)
+kafka:
+  replicaCount: 3
+  persistence:
+    size: 50Gi
+  metrics:
+    jmx:
+      enabled: true

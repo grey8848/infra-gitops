@@ -1,0 +1,6 @@
+# Prod Environment MySQL Overrides
+mysql:
+  architecture: replication
+  primary:
+    persistence:
+      size: 100Gi

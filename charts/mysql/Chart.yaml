@@ -1,0 +1,10 @@
+apiVersion: v2
+name: wrapper-mysql
+description: Wrapper chart for mysql infra
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: mysql
+    version: "9.14.0"
+    repository: "https://charts.bitnami.com/bitnami"

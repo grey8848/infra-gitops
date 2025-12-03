@@ -1,0 +1,6 @@
+# Dev Environment MySQL Overrides
+mysql:
+  primary:
+    persistence:
+      size: 5Gi
+  architecture: standalone

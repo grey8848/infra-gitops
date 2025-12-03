@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-flink
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/YOUR_USERNAME/.git' # TODO: 修改为你的 Git 地址
+    targetRevision: HEAD
+    path: charts/flink
+    helm:
+      valueFiles:
+        - values.yaml
+        - ../../environments/prod/flink-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod-infra
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
