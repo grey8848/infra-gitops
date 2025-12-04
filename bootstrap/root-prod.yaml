@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/grey8848/infra-gitops.git'
     targetRevision: HEAD
-    path: bootstrap/argocd-apps
+    path: bootstrap/argocd-apps/prod
     directory:
       recurse: true
   destination:

@@ -1,0 +1,91 @@
+# Argo Rollouts Helm 配置
+installCRDs: true           # 安装并升级 CRDs
+keepCRDs: true              # 卸载 Helm 时保留 CRDs
+clusterInstall: true        # 以集群模式运行控制器
+createClusterAggregateRoles: true  # 创建集群聚合角色
+
+# 全局配置
+global:
+  deploymentAnnotations: {}  # 部署的注解
+  deploymentLabels: {}      # 部署的标签
+  revisionHistoryLimit: 10  # 保留旧 ReplicaSets 的数量
+
+# 控制器配置
+controller:
+  component: rollouts-controller  # 组件标签值
+  replicas: 2                    # 控制器副本数
+  image:
+    registry: registry.cn-hangzhou.aliyuncs.com       # 镜像仓库
+    repository: ynqf/argo-rollouts  # 镜像仓库路径
+    pullPolicy: IfNotPresent     # 镜像拉取策略
+    tag: v1.8.2
+  resources:                     # 资源限制和请求
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  logging:
+    level: info                  # 日志级别
+    format: text                 # 日志格式
+  containerPorts:
+    metrics: 8090               # Metrics 端口
+    healthz: 8080               # Healthz 端口
+  livenessProbe:                # 存活探针
+    httpGet:
+      path: /healthz
+      port: healthz
+    initialDelaySeconds: 30
+    periodSeconds: 20
+  readinessProbe:               # 就绪探针
+    httpGet:
+      path: /metrics
+      port: metrics
+    initialDelaySeconds: 15
+    periodSeconds: 5
+  createClusterRole: true       # 创建集群角色 
+
+# 服务账户配置
+serviceAccount:
+  create: true                  # 创建服务账户
+  annotations: {}               # 服务账户注解
+
+# 安全上下文
+podSecurityContext:
+  runAsNonRoot: true            # 以非 root 用户运行
+containerSecurityContext:
+  allowPrivilegeEscalation: false  # 禁止权限提升
+  capabilities:
+    drop:
+      - ALL                    # 删除所有特权
+  readOnlyRootFilesystem: true   # 只读根文件系统
+
+# 提供者 RBAC 配置
+providerRBAC:
+  enabled: true                 # 启用提供者特定的 RBAC
+  providers:
+    istio: true                 # 启用 Istio RBAC
+    smi: true                   # 启用 SMI RBAC
+    ambassador: true            # 启用 Ambassador RBAC
+    awsLoadBalancerController: true  # 启用 AWS Load Balancer Controller RBAC
+
+# Dashboard 配置（可选）
+dashboard:
+  enabled: false                # 是否启用 Dashboard
+  replicas: 1                   # Dashboard 副本数
+  image:
+    registry: quay.io
+    repository: argoproj/kubectl-argo-rollouts
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP             # 服务类型
+    port: 3100                  # 服务端口
+  createClusterRole: true       # 创建 Dashboard 集群角色
+
+# 通知配置（可选）
+notifications:
+  configmap:
+    create: true                # 创建通知 ConfigMap
+  secret:
+    create: false               # 是否创建通知 Secret

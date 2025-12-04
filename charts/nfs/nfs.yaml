@@ -1,0 +1,10 @@
+replicaCount: 1
+strategyType: Recreate
+
+image:
+  repository: registry.cn-hangzhou.aliyuncs.com/ynqf/nfs-subdir-external-provisioner
+  tag: v4.0.2
+  pullPolicy: IfNotPresent
+nfs:
+  server: # 在 kind 中这里怎么填
+  path: /data # 这个是kind中的挂载目录
