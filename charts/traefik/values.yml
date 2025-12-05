@@ -1,0 +1,56 @@
+# ========== Dashboard ==========
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: Host(`dashboard.localhost`)
+    entryPoints:
+      - web
+
+# ========== Traefik EntryPoints ==========
+# Kind 集群中不需要 NodePort，由 kind yaml 负责端口映射
+ports:
+  web:
+    port: 8000
+    expose:
+      default: true
+    exposedPort: 80
+    protocol: TCP
+    nodePort: 30080
+  websecure:
+    port: 443
+    expose:
+      default: true
+    exposedPort: 443
+    nodePort: 30443
+    protocol: TCP
+
+# ========== Providers ==========
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesGateway:
+    enabled: true
+
+# ========== Gateway API ==========
+gateway:
+  listeners:
+    web:
+      port: 8000
+      hostname: ""
+      protocol: HTTP
+
+# ========== Logs (可选增强调试体验) ==========
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: true
+
+# ========== 强烈推荐开启 metrics (调试方便，可选) ==========
+metrics:
+  prometheus:
+    entryPoint: traefik
+    addEntryPointsLabels: true
+    addServicesLabels: true
+service:
+  type: NodePort

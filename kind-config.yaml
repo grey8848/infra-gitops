@@ -1,0 +1,25 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  # 1. 挂载宿主机目录 (对应 Minikube 的 --mount)
+  extraMounts:
+  - hostPath: /home/jack111/k8s-data
+    containerPath: /data
+  # 2. 映射端口 (解决 NodePort 访问问题)
+  extraPortMappings:
+  - containerPort: 30000
+    hostPort: 30000
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30080
+    hostPort: 30080
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30443
+    hostPort: 30443
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+networking:
+  # 3. 固定 API Server 端口 (对应 Minikube 的 --apiserver-port)
+  apiServerPort: 7443
