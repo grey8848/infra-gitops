@@ -1,22 +1,33 @@
-auth:
-  rootPassword: "root123456"
-  username: "appuser"
-  password: "app123456"
-  database: "appdb"
+# 关键：Wrapper Chart 必须把配置放在依赖名 "mysql" 下面
+mysql:
+  # 1. 镜像配置
+  image:
+    registry: local-registry:5000
+    repository: bitnami-mysql  # 确保你本地仓库里叫这个名字 (通常是 bitnami/mysql)
+    tag: 9.4.0
+    pullPolicy: IfNotPresent
 
-primary:
-  persistence:
-    enabled: true
-    existingClaim: mysql-pvc-data
+  # 2. 认证信息
+  auth:
+    rootPassword: "root123456"
+    username: "appuser"
+    password: "app123456"
+    database: "appdb"
 
-resources:
-  limits:
-    cpu: "500m"
-    memory: "1Gi"
-  requests:
-    cpu: "200m"
-    memory: "512Mi"
-image:
-  registry: local-registry:5000
-  repository: bitnami-mysql
-  tag: 9.4.0
+  # 3. 主节点配置 (包含持久化和资源限制)
+  primary:
+    # 持久化
+    persistence:
+      enabled: true
+      # ⚠️ 注意：使用 existingClaim 代表你必须提前手动创建好 PVC
+      # 如果你想让 helm 自动创建，请注释掉 existingClaim，使用 size: 10Gi
+      existingClaim: "mysql-pvc-data"
+    
+    # 资源限制 (移动到了 primary 下面)
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
