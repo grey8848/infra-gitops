@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-data
+spec:
+  storageClassName: standard  # 保持与 PVC 一致
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data               # 这里指定 Kind 节点内部的具体路径
+    type: DirectoryOrCreate   # 如果目录不存在则自动创建
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc-data
+  namespace: bigdata       # 记住这个名字，Helm 要用到
+spec:
+  storageClassName: standard  # 匹配现有的 SC 名字，确保绑定
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  volumeName: mysql-pv-data   # 核心：强制绑定到上面定义的 PV，跳过动态供给

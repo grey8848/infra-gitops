@@ -1,0 +1,52 @@
+## 全局配置
+global:
+  domain: ''
+  logging:
+    level: info
+
+## Argo CD 配置参数
+configs:
+  params:
+    # [Kind 优化] 开启非安全模式 (HTTP)。
+    # 本地环境没有有效证书，开启此项可避免浏览器报 SSL 错误，且无需配置 Ingress/TLS。
+    server.insecure: true
+    server.basehref: /
+    server.rootpath: ''
+
+## Argo CD Server (UI/API)
+server:
+  # [Kind 优化] 本地环境只需要 1 个副本
+  replicas: 1
+  service:
+    # 保持 ClusterIP，通过 kubectl port-forward 访问是最稳定的方式
+    type: ClusterIP
+
+## Application Controller
+controller:
+  # [Kind 优化] 本地环境只需要 1 个副本
+  replicas: 1
+
+## Repo Server
+repoServer:
+  # [Kind 优化] 本地环境只需要 1 个副本
+  replicas: 1
+
+## ApplicationSet Controller
+applicationSet:
+  # [Kind 优化] 本地环境只需要 1 个副本
+  replicas: 1
+
+## Redis
+redis:
+  # 使用内置的单节点 Redis
+  enabled: true
+
+## Redis HA (高可用)
+redis-ha:
+  # [Kind 优化] 关闭高可用 Redis 以节省内存和 CPU
+  enabled: false
+
+## 监控与通知 (可选关闭以节省资源)
+notifications:
+  enabled: true 
+  replicas: 1

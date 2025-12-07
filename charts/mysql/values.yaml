@@ -1,0 +1,22 @@
+auth:
+  rootPassword: "root123456"
+  username: "appuser"
+  password: "app123456"
+  database: "appdb"
+
+primary:
+  persistence:
+    enabled: true
+    existingClaim: mysql-pvc-data
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "1Gi"
+  requests:
+    cpu: "200m"
+    memory: "512Mi"
+image:
+  registry: local-registry:5000
+  repository: bitnami-mysql
+  tag: 9.4.0

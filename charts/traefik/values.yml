@@ -28,7 +28,7 @@ ports:
 providers:
   kubernetesCRD:
     enabled: true
-  kubernetesGateway:
+  kubernetesIngress:
     enabled: true
 
 # ========== Gateway API ==========

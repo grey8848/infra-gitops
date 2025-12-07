@@ -33,4 +33,17 @@ infra-gitops/
     └── prod/
         ├── kafka-values.yaml   # 生产环境的高可用/大磁盘配置
         └── ...
+# 在宿主机执行
+
+# 1. 找到你的 registry 容器名
+docker ps | grep registry
+
+# 2. 将 registry 连接到 kind 网络（假设容器名是 local-registry）
+docker network connect kind local-registry
+
+# 3. 测试连通性
+docker exec my-cluster-control-plane ping -c 2 local-registry
+docker exec my-cluster-control-plane curl http://local-registry:5000/v2/_catalog
+# 7. 测试拉取（使用 local-registry:5000）
+docker exec my-cluster-control-plane crictl pull local-registry:5000/traefik:latest
 ```
