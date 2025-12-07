@@ -19,6 +19,47 @@ mysql:
 
   # 3. 主节点配置 (包含持久化和资源限制)
   primary:
+    configuration: |-
+      [mysqld]
+      authentication_policy='{{- .Values.auth.authenticationPolicy | default "* ,," }}'
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mysql
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+      port={{ .Values.primary.containerPorts.mysql }}
+      mysqlx={{ ternary 1 0 .Values.primary.enableMySQLX }}
+      mysqlx_port={{ .Values.primary.containerPorts.mysqlx }}
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      datadir=/bitnami/mysql/data
+      tmpdir=/opt/bitnami/mysql/tmp
+      max_allowed_packet=16M
+      bind-address=*
+      pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+      log-error=/opt/bitnami/mysql/logs/mysqld.log
+      character-set-server=UTF8
+      slow_query_log=0
+      long_query_time=10.0
+      {{- if .Values.tls.enabled }}
+      ssl_cert=/opt/bitnami/mysql/certs/{{ .Values.tls.certFilename }}
+      ssl_key=/opt/bitnami/mysql/certs/{{ .Values.tls.certKeyFilename }}
+      {{- if (include "mysql.tlsCACert" .) }}
+      ssl_ca={{ include "mysql.tlsCACert" . }}
+      {{- end }}
+      {{- end }}
+      [client]
+      port={{ .Values.primary.containerPorts.mysql }}
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+      [manager]
+      port={{ .Values.primary.containerPorts.mysql }}
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+      server-id=1             # 必须唯一，单机设为 1 即可
+      log_bin=mysql-bin       # 开启 binlog 并指定文件前缀
+      binlog_format=ROW       # 推荐模式 (Flink CDC 通常需要 ROW 模式)
+      expire_logs_days=7      # 日志保留 7 天
+      binlog_row_image=FULL   # Flink CDC 需要 FULL 模式
     # 持久化
     persistence:
       enabled: true
