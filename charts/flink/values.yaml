@@ -4,6 +4,8 @@
 ## 全局配置
 global:
   # 如果使用私有镜像仓库，在这里配置
+  security:
+    allowInsecureImages: true
   imageRegistry: ""
   imagePullSecrets: []
 
