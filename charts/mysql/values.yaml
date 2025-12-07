@@ -1,3 +1,6 @@
+global:
+  security:
+    allowInsecureImages: true
 # 关键：Wrapper Chart 必须把配置放在依赖名 "mysql" 下面
 mysql:
   # 1. 镜像配置
