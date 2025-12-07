@@ -1,0 +1,261 @@
+## Apache Flink 开发环境配置
+## 使用方法: helm install flink bitnami/flink -f values-dev.yaml
+
+## 全局配置
+global:
+  # 如果使用私有镜像仓库，在这里配置
+  imageRegistry: ""
+  imagePullSecrets: []
+
+flink:  
+  ## 通用参数
+  nameOverride: "flink-dev"
+  fullnameOverride: ""
+  
+  ## 通用标签 - 标识这是开发环境
+  commonLabels:
+    environment: development
+    team: data-platform
+  
+  ## Apache Flink 镜像配置
+  image:
+    registry: local-registry:5000
+    repository: flink
+    tag: 1.20.1
+    pullPolicy: IfNotPresent
+    debug: true  # 开发环境启用调试模式
+  
+  ## JobManager 配置（控制平面）
+  jobmanager:
+    # 开发环境单实例即可
+    replicaCount: 1
+    
+    # 开发环境使用较小的资源配置
+    resourcesPreset: "nano"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    
+    # 环境变量配置
+    extraEnvVars:
+      - name: FLINK_ENV
+        value: "development"
+      - name: FLINK_PROPERTIES
+        value: |
+          jobmanager.memory.process.size: 1600m
+          taskmanager.memory.process.size: 1728m
+          taskmanager.numberOfTaskSlots: 2
+          parallelism.default: 2
+          state.backend: filesystem
+          state.checkpoints.dir: file:///tmp/flink-checkpoints
+          state.savepoints.dir: file:///tmp/flink-savepoints
+          execution.checkpointing.interval: 10s
+          execution.checkpointing.min-pause: 5s
+          rest.flamegraph.enabled: true
+          # 开发环境：启用更详细的日志
+          rootLogger.level: INFO
+          logger.akka.level: INFO
+          logger.kafka.level: WARN
+          logger.hadoop.level: WARN
+    
+    # 容器端口
+    containerPorts:
+      rpc: 6123
+      http: 8081
+      blob: 6124
+    
+    # 服务配置 - 开发环境使用 NodePort 便于访问 UI
+    service:
+      type: NodePort
+      ports:
+        rpc: 6123
+        http: 8081
+        blob: 6124
+      nodePorts:
+        http: 30121  # 通过 http://<node-ip>:30081 访问 Flink UI
+        rpc: ""
+        blob: ""
+      annotations: {}
+    
+    # 健康检查 - 开发环境放宽条件
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 5
+      successThreshold: 1
+    
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
+    
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30
+      successThreshold: 1
+    
+    # Pod 注解 - 便于识别
+    podAnnotations:
+      environment: "development"
+      description: "Flink JobManager for development"
+    
+    podLabels:
+      component: jobmanager
+      env: dev
+    
+    # 网络策略 - 开发环境允许所有外部访问
+    networkPolicy:
+      enabled: false  # 开发环境禁用网络策略，便于调试
+    
+    # PDB - 开发环境不需要
+    pdb:
+      create: false
+    
+    # 安全上下文 - 开发环境可以适当放宽
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false  # 开发环境允许写入，便于调试
+      privileged: false
+      capabilities:
+        drop: ["ALL"]
+    
+    # 亲和性 - 开发环境不需要
+    podAntiAffinityPreset: ""
+    
+    # ServiceAccount
+    serviceAccount:
+      create: true
+      name: ""
+      automountServiceAccountToken: true
+  
+  ## TaskManager 配置（工作节点）
+  taskmanager:
+    # 开发环境 1-2 个 TaskManager 即可
+    replicaCount: 1
+    
+    # 开发环境使用较小的资源配置
+    resourcesPreset: "nano"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    
+    # 环境变量配置
+    extraEnvVars:
+      - name: FLINK_ENV
+        value: "development"
+      - name: TASK_MANAGER_NUMBER_OF_TASK_SLOTS
+        value: "2"
+    
+    # 容器端口
+    containerPorts:
+      data: 6121
+      rpc: 6122
+      internalMetrics: 6126
+    
+    # 服务配置
+    service:
+      type: ClusterIP
+      ports:
+        data: 6121
+        rpc: 6122
+        internalMetrics: 6126
+    
+    # 健康检查 - 开发环境放宽条件
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 5
+      successThreshold: 1
+    
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
+    
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30
+      successThreshold: 1
+    
+    # Pod 注解
+    podAnnotations:
+      environment: "development"
+      description: "Flink TaskManager for development"
+    
+    podLabels:
+      component: taskmanager
+      env: dev
+    
+    # 网络策略 - 开发环境禁用
+    networkPolicy:
+      enabled: false
+    
+    # PDB - 开发环境不需要
+    pdb:
+      create: false
+    
+    # 安全上下文
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false  # 开发环境允许写入
+      privileged: false
+      capabilities:
+        drop: ["ALL"]
+    
+    # Pod 管理策略
+    podManagementPolicy: Parallel
+    
+    # 亲和性 - 开发环境不需要
+    podAntiAffinityPreset: ""
+    
+    # ServiceAccount
+    serviceAccount:
+      create: true
+      name: ""
+      automountServiceAccountToken: true
+  
+  ## 诊断模式 - 开发环境可根据需要启用
+  diagnosticMode:
+    enabled: false
+    command:
+      - sleep
+    args:
+      - infinity
