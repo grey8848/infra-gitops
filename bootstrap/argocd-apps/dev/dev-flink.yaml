@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/YOUR_USERNAME/.git' # TODO: 修改为你的 Git 地址
+    repoURL: 'https://github.com/grey8848/infra-gitops.git' # TODO: 修改为你的 Git 地址
     targetRevision: HEAD
     path: charts/flink
     helm:
