@@ -65,6 +65,19 @@ docker exec "$NODE" bash -c "
   systemctl show containerd | grep -i proxy
   echo "$http_proxy"
 "
+docker exec my-cluster-control-plane 'cat > /tmp/registry.patch <<EOT
+[plugins."io.containerd.grpc.v1.cri".registry]
+  config_path = "/etc/containerd/certs.d"
+EOT
+cat /tmp/registry.patch >> /etc/containerd/config.toml'
+docker exec my-cluster-control-plane mkdir -p /etc/containerd/certs.d/localhost:5031
+docker exec my-cluster-control-plane sh -c 'cat > /etc/containerd/certs.d/localhost:5031/hosts.toml << "EOF"
+server = "http://local-registry:5000"
+
+[host."http://local-registry:5000"]
+  capabilities = ["pull", "resolve", "push"]
+  skip_verify = true
+EOF'
 
 echo
 echo "===> Proxy injection completed for cluster '$CLUSTER_NAME'."
