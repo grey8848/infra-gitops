@@ -17,8 +17,8 @@ kafka:
       protocol: PLAINTEXT
   
   image:
-    registry: registry.cn-hangzhou.aliyuncs.com
-    repository: ynqf/kafka
+    registry: local-registry:5000
+    repository: kafka
     tag: 3.9.0-debian-12-r10
     pullPolicy: IfNotPresent
   
