@@ -1,0 +1,60 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  defaultStorageClass: ""
+  security:
+    ## @param global.security.allowInsecureImages Allows skipping image verification
+    allowInsecureImages: true
+kafka:
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    external:
+      protocol: PLAINTEXT
+  
+  image:
+    registry: registry.cn-hangzhou.aliyuncs.com
+    repository: ynqf/kafka
+    tag: 3.9.0-debian-12-r10
+    pullPolicy: IfNotPresent
+  
+  # 使用控制器作为 Kafka 节点（Kraft 模式）
+  controller:
+    replicaCount: 1
+    # 启用 Kafka Raft 模式（Kraft模式），不依赖 ZooKeeper
+    zookeeperMigrationMode: true
+    minId: 0
+    heapOpts: -Xmx2048m -Xms2048m  # 2GB
+    nodeSelector:
+      kafka-node: "true"
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+    persistence:
+      enabled: false
+    logPersistence:
+      enabled: false
+    resourcesPreset: "micro"
+  kraft:
+    ## @param kraft.enabled Switch to enable or disable the KRaft mode for Kafka
+    ##
+    enabled: true
+    existingClusterIdSecret: ""
+    ## 首次生成clusterId 可以设为"" 系统会自动生成clusterId 当需要迁移集群时可以使用命令查看当前clusterId
+    ## kubectl get secret -n fpg-cloud 
+    ## kubectl describe secret kraft-kafka-kraft-cluster-id -n fpg-cloud
+    ## kubectl get secret kraft-kafka-kraft-cluster-id -n fpg-cloud -o yaml
+    clusterId: ""
+  
+  # Broker-only 节点不需要部署
+  broker:
+    replicaCount: 0
