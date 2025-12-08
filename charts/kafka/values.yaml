@@ -41,7 +41,7 @@ kafka:
       enabled: false
     logPersistence:
       enabled: false
-    resourcesPreset: "micro"
+    resourcesPreset: "large"
   kraft:
     ## @param kraft.enabled Switch to enable or disable the KRaft mode for Kafka
     ##
