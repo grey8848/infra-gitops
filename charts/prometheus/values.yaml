@@ -1,5 +1,5 @@
 # 让所有组件资源更轻，适配 KIND
-kubePrometheusStack:
+prometheus:
   prometheus:
     ingress:
       enabled: false
@@ -46,10 +46,6 @@ kubePrometheusStack:
       limits:
         cpu: 100m
         memory: 300Mi
-    service:
-      type: NodePort
-      nodePort: 30122
-  
   kubeStateMetrics:
     resources:
       requests:
