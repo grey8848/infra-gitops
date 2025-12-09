@@ -1,5 +1,5 @@
 # 让所有组件资源更轻，适配 KIND
-prometheus:
+kubePrometheusStack:
   prometheus:
     ingress:
       enabled: false
@@ -48,7 +48,7 @@ prometheus:
         memory: 300Mi
     service:
       type: NodePort
-      nodePort: 30080
+      nodePort: 30122
   
   kubeStateMetrics:
     resources:
