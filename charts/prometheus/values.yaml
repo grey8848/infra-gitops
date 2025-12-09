@@ -1,80 +1,65 @@
-# 让所有组件资源更轻，适配 KIND
-prometheus:
-  prometheusSpec:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 300Mi
-      limits:
-        cpu: 300m
-        memory: 600Mi
-    retention: 24h
-    storageSpec:
-      emptyDir: {}   # KIND 无持久化，用 emptyDir 即可
-
-alertmanager:
-  alertmanagerSpec:
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 100m
-        memory: 200Mi
-    storage:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: ""
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 500Mi
-
-grafana:
-  adminPassword: "admin"
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 100m
-      memory: 300Mi
-kubeStateMetrics:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 50Mi
-    limits:
-      cpu: 50m
-      memory: 100Mi
-
-nodeExporter:
-  resources:
-    requests:
-      cpu: 10m
-      memory: 50Mi
-    limits:
-      cpu: 30m
-      memory: 100Mi
-
-prometheusOperator:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 100m
-      memory: 200Mi
-
-# KIND 不需要 ingress
-grafana:
-  ingress:
+kube-prometheus-stack:  
+  prometheus:
+    prometheusSpec:
+      retention: 15d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: "standard"
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 50Gi
+  crds:
     enabled: false
-
-alertmanager:
-  ingress:
+  alertmanager:
+    enabled: true
+    config:
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by:
+          - "namespace"
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        receiver: "null"
+        routes:
+          - matchers:
+              - alertname = "Watchdog"
+            receiver: "null"
+      receivers:
+        - name: "null"
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: "standard"
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+  
+  grafana:
+    enabled: true
+    adminPassword: "admin"
+    persistence:
+      enabled: true
+      storageClassName: "standard"
+      size: 10Gi
+      accessModes:
+        - ReadWriteOnce
+  
+  kubeControllerManager:
     enabled: false
-
-prometheus:
-  ingress:
+  
+  kubeScheduler:
     enabled: false
+  
+  kubeEtcd:
+    enabled: false
+  
+  nodeExporter:
+    enabled: true
