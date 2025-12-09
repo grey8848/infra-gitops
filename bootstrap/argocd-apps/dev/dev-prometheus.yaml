@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/grey8848/infra-gitops.git' # TODO: 修改为你的 Git 地址
     targetRevision: HEAD
-    path: charts/prometheusStack
+    path: charts/prometheus
     helm:
       valueFiles:
         - values.yaml
