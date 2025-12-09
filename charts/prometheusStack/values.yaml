@@ -1,0 +1,78 @@
+# 让所有组件资源更轻，适配 KIND
+prometheusStack:
+  prometheus:
+    ingress:
+      enabled: false
+    prometheusSpec:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 300Mi
+        limits:
+          cpu: 300m
+          memory: 600Mi
+      retention: 24h
+      storageSpec:
+        emptyDir: {}   # KIND 无持久化，用 emptyDir 即可
+  
+  alertmanager:
+    ingress:
+      enabled: false
+    alertmanagerSpec:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+        limits:
+          cpu: 100m
+          memory: 200Mi
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: ""
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 500Mi
+  
+  grafana:
+    adminPassword: "admin"
+    ingress:
+      enabled: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 300Mi
+    service:
+      type: NodePort
+      nodePort: 30080
+  
+  kubeStateMetrics:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 100Mi
+  
+  nodeExporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 30m
+        memory: 100Mi
+  
+  prometheusOperator:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 200Mi
