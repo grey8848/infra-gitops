@@ -10,7 +10,8 @@ spec:
       app.kubernetes.io/name: kafka
   namespaceSelector:
     matchNames:
-      - dev
+      - bigdata
   endpoints:
     - port: jmx-metrics
       interval: 30s
+      path: /metrics
