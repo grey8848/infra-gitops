@@ -45,11 +45,11 @@ kafka:
   metrics:
     jmx:
       enabled: true
-    image:
-      registry: local-registry:5000
-      repository: kafka-jmx-exporter
-      tag: 1.2.0-debian-12-r4
-      pullPolicy: IfNotPresent
+      image:
+        registry: local-registry:5000
+        repository: kafka-jmx-exporter
+        tag: 1.2.0-debian-12-r4
+        pullPolicy: IfNotPresent
   kraft:
     ## @param kraft.enabled Switch to enable or disable the KRaft mode for Kafka
     ##
