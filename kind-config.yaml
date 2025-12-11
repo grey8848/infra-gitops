@@ -1,4 +1,3 @@
-kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
@@ -20,6 +19,31 @@ nodes:
     hostPort: 30443
     listenAddress: "0.0.0.0"
     protocol: TCP
+  - containerPort: 36123
+    hostPort: 36123
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30909
+    hostPort: 30909
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30600
+    hostPort: 30600
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30101
+    hostPort: 30101
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30121
+    hostPort: 30121
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+  - containerPort: 30122
+    hostPort: 30122
+    listenAddress: "0.0.0.0"
+    protocol: TCP
+
 networking:
   # 3. 固定 API Server 端口 (对应 Minikube 的 --apiserver-port)
   apiServerPort: 7443
