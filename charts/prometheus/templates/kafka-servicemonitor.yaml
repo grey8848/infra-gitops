@@ -2,6 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: kafka-jmx-servicemonitor
+  namespace: monitoring
   labels:
     release: dev-prometheus   # 注意：必须与 kube-prometheus-stack 的 release 一致
 spec:
