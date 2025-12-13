@@ -45,6 +45,7 @@ kafka:
   metrics:
     jmx:
       enabled: true
+      kafkaJmxPort: 5555
       image:
         registry: local-registry:5000
         repository: kafka-jmx-exporter
