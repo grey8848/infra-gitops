@@ -50,6 +50,20 @@ kafka:
         repository: kafka-jmx-exporter
         tag: 1.2.0-debian-12-r4
         pullPolicy: IfNotPresent
+      whitelistObjectNames:
+      - kafka.controller:*
+      - kafka.server:*
+      - java.lang:*
+      - kafka.network:*
+      - kafka.log:*
+      config: |-
+        jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:{{ .Values.metrics.jmx.kafkaJmxPort }}/jmxrmi
+        lowercaseOutputName: true
+        lowercaseOutputLabelNames: true
+        ssl: false
+        {{- if .Values.metrics.jmx.whitelistObjectNames }}
+        whitelistObjectNames: ["{{ join "\",\"" .Values.metrics.jmx.whitelistObjectNames }}"]
+        {{- end }}
       extraRules: |-
         - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(used|committed|max):'
           name: jvm_memory_bytes_$1
