@@ -50,57 +50,7 @@ kafka:
         repository: kafka-jmx-exporter
         tag: 1.2.0-debian-12-r4
         pullPolicy: IfNotPresent
-      whitelistObjectNames:
-      - kafka.controller:*
-      - kafka.server:*
-      - java.lang:*
-      - kafka.network:*
-      - kafka.log:*
-      config: |-
-        jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:{{ .Values.metrics.jmx.kafkaJmxPort }}/jmxrmi
-        lowercaseOutputName: true
-        lowercaseOutputLabelNames: true
-        ssl: false
-        whitelistObjectNames: ["kafka.controller:*","kafka.server:*","java.lang:*","kafka.network:*","kafka.log:*"]
-        rules:
-          - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(used|committed|max):'
-            name: jvm_memory_bytes_$1
-            labels:
-              area: heap
-            type: GAUGE
-          - pattern: 'java.lang<type=Memory><NonHeapMemoryUsage>(used|committed|max):'
-            name: jvm_memory_bytes_$1
-            labels:
-              area: nonheap
-            type: GAUGE
-          - pattern: 'java.lang<type=Threading><>ThreadCount:'
-            name: jvm_threads_current
-            type: GAUGE
-          - pattern: 'java.lang<type=GarbageCollector, name=(.+)><>CollectionCount:'
-            name: jvm_gc_collection_seconds_count
-            labels:
-              gc: "$1"
-            type: COUNTER
-          - pattern: 'java.lang<type=GarbageCollector, name=(.+)><>CollectionTime:'
-            name: jvm_gc_collection_seconds_sum
-            labels:
-              gc: "$1"
-            type: COUNTER
-          - pattern: 'kafka.server<type=(.+), name=(.+)><>Value:'
-            name: kafka_server_$1_$2
-            type: GAUGE
-          - pattern: 'kafka.server<type=(.+), name=(.+)><>Count:'
-            name: kafka_server_$1_$2_total
-            type: COUNTER
-          - pattern: 'kafka.network<type=(.+), name=(.+)><>Value:'
-            name: kafka_network_$1_$2
-            type: GAUGE
-          - pattern: 'kafka.network<type=(.+), name=(.+)><>Count:'
-            name: kafka_network_$1_$2_total
-            type: COUNTER
-          - pattern: 'kafka.controller<type=(.+), name=(.+)><>Value:'
-            name: kafka_controller_$1_$2
-            type: GAUGE
+      existingConfigmap: "{{ include \"kafka.fullname\" . }}-jmx-exporter"
   kraft:
     ## @param kraft.enabled Switch to enable or disable the KRaft mode for Kafka
     ##
