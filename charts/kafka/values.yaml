@@ -50,7 +50,7 @@ kafka:
         repository: kafka-jmx-exporter
         tag: 1.2.0-debian-12-r4
         pullPolicy: IfNotPresent
-      existingConfigmap: "{{ include \"kafka.fullname\" . }}-jmx-exporter"
+      existingConfigmap: dev-kafka-jmx-exporter
   kraft:
     ## @param kraft.enabled Switch to enable or disable the KRaft mode for Kafka
     ##
