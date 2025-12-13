@@ -5,7 +5,7 @@ metadata:
   namespace: bigdata
 data:
   jmx-kafka-prometheus.yml: |
-    jmxUrl: service:jmx:rmi:///jndi/rmi://128.0.0.1:{{ default 5555 .Values.metrics.jmx.kafkaJmxPort }}/jmxrmi
+    jmxUrl: service:jmx:rmi:///jndi/rmi://128.0.0.1:5555/jmxrmi
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true
     ssl: false
