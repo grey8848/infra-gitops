@@ -18,6 +18,7 @@ data:
       - java.lang:*
 
     rules:
+      # JVM Memory Metrics
       - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(used|committed|max):'
         name: jvm_memory_bytes_$1
         labels:
@@ -28,9 +29,13 @@ data:
         labels:
           area: nonheap
         type: GAUGE
+
+      # JVM Thread Metrics
       - pattern: 'java.lang<type=Threading><>ThreadCount:'
         name: jvm_threads_current
         type: GAUGE
+
+      # JVM GC Metrics
       - pattern: 'java.lang<type=GarbageCollector, name=(.+)><>CollectionCount:'
         name: jvm_gc_collection_seconds_count
         labels:
@@ -40,4 +45,144 @@ data:
         name: jvm_gc_collection_seconds_sum
         labels:
           gc: "$1"
+        type: COUNTER
+
+      # Kafka Broker Metrics - Messages In/Out
+      - pattern: 'kafka.server<type=BrokerTopicMetrics, name=MessagesInPerSec><>Count'
+        name: kafka_server_brokertopicmetrics_messagesin_total
+        type: COUNTER
+      - pattern: 'kafka.server<type=BrokerTopicMetrics, name=BytesInPerSec><>Count'
+        name: kafka_server_brokertopicmetrics_bytesin_total
+        type: COUNTER
+      - pattern: 'kafka.server<type=BrokerTopicMetrics, name=BytesOutPerSec><>Count'
+        name: kafka_server_brokertopicmetrics_bytesout_total
+        type: COUNTER
+
+      # Kafka Broker Metrics - Per Topic
+      - pattern: 'kafka.server<type=BrokerTopicMetrics, name=(BytesInPerSec|BytesOutPerSec|MessagesInPerSec), topic=(.+)><>Count'
+        name: kafka_server_brokertopicmetrics_$1_total
+        labels:
+          topic: "$2"
+        type: COUNTER
+
+      # Kafka Network Request Metrics
+      - pattern: 'kafka.network<type=RequestMetrics, name=RequestsPerSec, request=(\w+)><>Count'
+        name: kafka_network_requestmetrics_requests_total
+        labels:
+          request: "$1"
+        type: COUNTER
+      - pattern: 'kafka.network<type=RequestMetrics, name=TotalTimeMs, request=(\w+)><>Mean'
+        name: kafka_network_requestmetrics_totaltimems_mean
+        labels:
+          request: "$1"
+        type: GAUGE
+      - pattern: 'kafka.network<type=RequestMetrics, name=TotalTimeMs, request=(\w+)><>(\d+)thPercentile'
+        name: kafka_network_requestmetrics_totaltimems_percentile
+        labels:
+          request: "$1"
+          percentile: "$2"
+        type: GAUGE
+
+      # Kafka Request Queue Size
+      - pattern: 'kafka.network<type=RequestChannel, name=RequestQueueSize><>Value'
+        name: kafka_network_requestchannel_queue_size
+        type: GAUGE
+
+      # Kafka Partition Metrics
+      - pattern: 'kafka.log<type=Log, name=Size, topic=(.+), partition=(\d+)><>Value'
+        name: kafka_log_size_bytes
+        labels:
+          topic: "$1"
+          partition: "$2"
+        type: GAUGE
+      - pattern: 'kafka.cluster<type=Partition, name=UnderReplicated, topic=(.+), partition=(\d+)><>Value'
+        name: kafka_cluster_partition_underreplicated
+        labels:
+          topic: "$1"
+          partition: "$2"
+        type: GAUGE
+
+      # Kafka Controller Metrics
+      - pattern: 'kafka.controller<type=KafkaController, name=ActiveControllerCount><>Value'
+        name: kafka_controller_active_count
+        type: GAUGE
+      - pattern: 'kafka.controller<type=KafkaController, name=OfflinePartitionsCount><>Value'
+        name: kafka_controller_offline_partitions_count
+        type: GAUGE
+      - pattern: 'kafka.controller<type=ControllerStats, name=LeaderElectionRateAndTimeMs><>Count'
+        name: kafka_controller_leader_election_total
+        type: COUNTER
+      - pattern: 'kafka.controller<type=ControllerStats, name=UncleanLeaderElectionsPerSec><>Count'
+        name: kafka_controller_unclean_leader_election_total
+        type: COUNTER
+
+      # Kafka Replica Manager Metrics
+      - pattern: 'kafka.server<type=ReplicaManager, name=UnderReplicatedPartitions><>Value'
+        name: kafka_server_replica_manager_under_replicated_partitions
+        type: GAUGE
+      - pattern: 'kafka.server<type=ReplicaManager, name=PartitionCount><>Value'
+        name: kafka_server_replica_manager_partition_count
+        type: GAUGE
+      - pattern: 'kafka.server<type=ReplicaManager, name=LeaderCount><>Value'
+        name: kafka_server_replica_manager_leader_count
+        type: GAUGE
+      - pattern: 'kafka.server<type=ReplicaManager, name=IsrShrinksPerSec><>Count'
+        name: kafka_server_replica_manager_isr_shrinks_total
+        type: COUNTER
+      - pattern: 'kafka.server<type=ReplicaManager, name=IsrExpandsPerSec><>Count'
+        name: kafka_server_replica_manager_isr_expands_total
+        type: COUNTER
+
+      # Kafka Replica Fetcher Metrics
+      - pattern: 'kafka.server<type=ReplicaFetcherManager, name=MaxLag, clientId=Replica><>Value'
+        name: kafka_server_replica_fetcher_max_lag
+        type: GAUGE
+
+      # Kafka Request Handler Metrics
+      - pattern: 'kafka.server<type=KafkaRequestHandlerPool, name=RequestHandlerAvgIdlePercent><>OneMinuteRate'
+        name: kafka_server_request_handler_avg_idle_percent
+        type: GAUGE
+
+      # Kafka Purgatory Metrics
+      - pattern: 'kafka.server<type=DelayedOperationPurgatory, name=PurgatorySize, delayedOperation=(\w+)><>Value'
+        name: kafka_server_purgatory_size
+        labels:
+          operation: "$1"
+        type: GAUGE
+
+      # Kafka Log Flush Metrics
+      - pattern: 'kafka.log<type=LogFlushStats, name=LogFlushRateAndTimeMs><>Count'
+        name: kafka_log_flush_total
+        type: COUNTER
+      - pattern: 'kafka.log<type=LogFlushStats, name=LogFlushRateAndTimeMs><>Mean'
+        name: kafka_log_flush_time_ms_mean
+        type: GAUGE
+
+      # Kafka Zookeeper Connection Metrics
+      - pattern: 'kafka.server<type=SessionExpireListener, name=ZooKeeperDisconnectsPerSec><>Count'
+        name: kafka_server_zookeeper_disconnects_total
+        type: COUNTER
+      - pattern: 'kafka.server<type=SessionExpireListener, name=ZooKeeperExpiresPerSec><>Count'
+        name: kafka_server_zookeeper_expires_total
+        type: COUNTER
+
+      # Kafka Consumer Group Lag (if using Kafka consumer groups)
+      - pattern: 'kafka.server<type=FetcherLagMetrics, name=ConsumerLag, clientId=(.+), topic=(.+), partition=(\d+)><>Value'
+        name: kafka_server_consumer_lag
+        labels:
+          client_id: "$1"
+          topic: "$2"
+          partition: "$3"
+        type: GAUGE
+
+      # Kafka Network Processor Metrics
+      - pattern: 'kafka.network<type=Processor, name=IdlePercent, networkProcessor=(\d+)><>Value'
+        name: kafka_network_processor_idle_percent
+        labels:
+          processor: "$1"
+        type: GAUGE
+
+      # Kafka Produce/Fetch Request Metrics
+      - pattern: 'kafka.server<type=BrokerTopicMetrics, name=(TotalProduceRequestsPerSec|TotalFetchRequestsPerSec|FailedProduceRequestsPerSec|FailedFetchRequestsPerSec)><>Count'
+        name: kafka_server_brokertopicmetrics_$1_total
         type: COUNTER
