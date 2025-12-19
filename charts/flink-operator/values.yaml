@@ -1,0 +1,18 @@
+flink-operator:
+  watchNamespaces:
+  - flink
+
+  rbac:
+    create: true
+
+  webhook:
+    create: true
+
+  defaultConfiguration:
+    create: true
+    append: true
+  image:
+    repository: local-registry:5000/flink-operator
+    pullPolicy: IfNotPresent
+    tag: "b40c553"
+    digest: ""
