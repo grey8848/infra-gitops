@@ -1,0 +1,4 @@
+apiVersion: v2
+name: flink-jobs
+version: 0.1.0
+description: Flink jobs (FlinkDeployment CRs)
