@@ -23,3 +23,16 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+  ignoreDifferences:
+    - group: flink.apache.org
+      kind: FlinkDeployment
+      jsonPointers:
+        - /status
+    - group: flink.apache.org
+      kind: FlinkSessionJob
+      jsonPointers:
+        - /status
+    - group: flink.apache.org
+      kind: FlinkStateSnapshot
+      jsonPointers:
+        - /status

@@ -3,11 +3,6 @@ kind: FlinkDeployment
 metadata:
   name: {{ .Values.job.name }}
 spec:
-  ignoreDifferences:
-     - group: flink.apache.org
-       kind: FlinkDeployment
-       jsonPointers:
-         - /status
   image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
   flinkVersion: v1_20
 
