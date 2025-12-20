@@ -1,0 +1,25 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: flink-demo
+  namespace: flink
+spec:
+  image: local-registry:5000/flink:1.20.1
+  flinkVersion: v1_20
+
+  jobManager:
+    replicas: 1
+    resource:
+      cpu: 1
+      memory: "1024m"
+
+  taskManager:
+    replicas: 1
+    resource:
+      cpu: 1
+      memory: "1024m"
+
+  job:
+    jarURI: local:///opt/flink/examples/streaming/StateMachineExample.jar
+    parallelism: 1
+    upgradeMode: stateless
