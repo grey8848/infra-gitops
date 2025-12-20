@@ -1,5 +1,5 @@
 image:
-  repository: local-registry:5000/flink-orgin:1.20.1
+  repository: local-registry:5000/flink-orgin
   tag: 1.20.1
 
 job:
