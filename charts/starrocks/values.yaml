@@ -1,0 +1,55 @@
+starrocksCluster:
+  enabled: true
+  name: sr-kind
+  frontend:
+    replicas: 1   # kind 必须降级
+    resources:
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+    storage:
+      type: hostPath
+      hostPath:
+        path: /data/starrocks/fe
+
+    service:
+      type: NodePort
+      ports:
+        - name: mysql
+          port: 9030
+          nodePort: 30903
+        - name: http
+          port: 8030
+          nodePort: 30803
+  backend:
+    replicas: 1
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "4"
+        memory: "8Gi"
+
+    storage:
+      type: hostPath
+      hostPath:
+        path: /data/starrocks/be
+
+    service:
+      type: ClusterIP
+  starrocksConf:
+    fe.conf: |
+      http_port = 8030
+      query_port = 9030
+      enable_authentication = true
+
+    be.conf: |
+      webserver_port = 8040
+      heartbeat_service_port = 9050
+      mem_limit = 70%
+      enable_cgroup_memory_limit = false
+
