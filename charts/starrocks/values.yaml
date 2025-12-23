@@ -3,7 +3,7 @@ starrocks:
     starrocksOperator:
       image:
         # image sliced by "repository:tag"
-        repository: starrocks/operator
+        repository: local-registry:5000/starrocks-operator
         tag: v1.11.3
       imagePullPolicy: IfNotPresent
       replicaCount: 1
@@ -24,34 +24,21 @@ starrocks:
       replicas: 1
       image:
         # image sliced by "repository:tag"
-        repository: starrocks/fe-ubuntu
-        tag: ""
+        repository: local-registry:5000/starrocks-fe-ubuntu
+        tag: "3.5-latest"
       imagePullPolicy: IfNotPresent
       storageSpec:
         name: "fe"
         storageSize: "10Gi"
         storageClassName: "standard"
         storageMountPath: /opt/starrocks/fe/meta
-    starrocksCnSpec:
-      image:
-        # image sliced by "repository:tag"
-        repository: starrocks/cn-ubuntu
-        tag: ""
-      imagePullPolicy: IfNotPresent
-      storageSpec:
-        name: fe
-        storageClassName: standard
-        storageSize: 10Gi
-        storageMountPath: /opt/starrocks/cn/storage
-        # 关闭 FE 日志持久化
-        logStorageSize: 0Gi
     starrocksBeSpec:
       # number of replicas to deploy.
       replicas: 1
       image:
         # image sliced by "repository:tag"
-        repository: starrocks/be-ubuntu
-        tag: ""
+        repository: local-registry:5000/starrocks-be-ubuntu
+        tag: "3.5-latest"
       imagePullPolicy: IfNotPresent
       storageSpec:
         name: be
