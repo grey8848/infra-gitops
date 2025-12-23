@@ -1,5 +1,5 @@
 apiVersion: v2
-name: starrocks
+name: wrapper-starrocks
 description: chart for starrocks infra
 type: application
 version: 0.1.0

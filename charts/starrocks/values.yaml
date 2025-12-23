@@ -1,64 +1,66 @@
-operator:
-  starrocksOperator:
-    image:
-      # image sliced by "repository:tag"
-      repository: starrocks/operator
-      tag: v1.11.3
-    imagePullPolicy: IfNotPresent
-    replicaCount: 1
-    resources:
-      limits:
-        cpu: 500m
-        memory: 800Mi
-      requests:
-        cpu: 500m
-        memory: 400Mi
 starrocks:
-  starrocksCluster:
-    componentValues:
+  operator:
+    starrocksOperator:
       image:
-        tag: "3.5-latest"
-  starrocksFESpec:
-    # number of replicas to deploy for a FE statefulset.
-    replicas: 1
-    image:
-      # image sliced by "repository:tag"
-      repository: starrocks/fe-ubuntu
-      tag: ""
-    imagePullPolicy: IfNotPresent
-    storageSpec:
-      name: "fe"
-      storageSize: "10Gi"
-      storageClassName: "standard"
-      storageMountPath: /opt/starrocks/fe/meta
-  starrocksCnSpec:
-    image:
-      # image sliced by "repository:tag"
-      repository: starrocks/cn-ubuntu
-      tag: ""
-    imagePullPolicy: IfNotPresent
-    storageSpec:
-      name: fe
-      storageClassName: standard
-      storageSize: 10Gi
-      storageMountPath: /opt/starrocks/fe/meta
-      # 关闭 FE 日志持久化
-      logStorageSize: 0Gi
-  starrocksBeSpec:
-    # number of replicas to deploy.
-    replicas: 1
-    image:
-      # image sliced by "repository:tag"
-      repository: starrocks/be-ubuntu
-      tag: ""
-    imagePullPolicy: IfNotPresent
-    storageSpec:
-      name: be
-      storageClassName: standard
-      storageSize: 100Gi
-      storageCount: 1
-      storageMountPath: /opt/starrocks/be/storage
-      logStorageSize: 0Gi
-      spillStorageSize: 0Gi
+        # image sliced by "repository:tag"
+        repository: starrocks/operator
+        tag: v1.11.3
+      imagePullPolicy: IfNotPresent
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 800Mi
+        requests:
+          cpu: 500m
+          memory: 400Mi
+  starrocks:
+    starrocksCluster:
+      componentValues:
+        image:
+          tag: "3.5-latest"
+    starrocksFESpec:
+      # number of replicas to deploy for a FE statefulset.
+      replicas: 1
+      image:
+        # image sliced by "repository:tag"
+        repository: starrocks/fe-ubuntu
+        tag: ""
+      imagePullPolicy: IfNotPresent
+      storageSpec:
+        name: "fe"
+        storageSize: "10Gi"
+        storageClassName: "standard"
+        storageMountPath: /opt/starrocks/fe/meta
+    starrocksCnSpec:
+      image:
+        # image sliced by "repository:tag"
+        repository: starrocks/cn-ubuntu
+        tag: ""
+      imagePullPolicy: IfNotPresent
+      storageSpec:
+        name: fe
+        storageClassName: standard
+        storageSize: 10Gi
+        storageMountPath: /opt/starrocks/cn/storage
+        # 关闭 FE 日志持久化
+        logStorageSize: 0Gi
+    starrocksBeSpec:
+      # number of replicas to deploy.
+      replicas: 1
+      image:
+        # image sliced by "repository:tag"
+        repository: starrocks/be-ubuntu
+        tag: ""
+      imagePullPolicy: IfNotPresent
+      storageSpec:
+        name: be
+        storageClassName: standard
+        storageSize: 100Gi
+        storageCount: 1
+        storageMountPath: /opt/starrocks/be/storage
+        logStorageSize: 0Gi
+        spillStorageSize: 0Gi
+
 
 
