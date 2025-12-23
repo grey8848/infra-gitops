@@ -221,6 +221,6 @@ FROM dws.dws_user_action_day
 GROUP BY dt;
 
 ```
-
+这是我理解的数仓的设计结构
 
 
