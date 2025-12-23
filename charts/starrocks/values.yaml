@@ -1,4 +1,4 @@
-starrocks:
+kube-starrocks:
   operator:
     starrocksOperator:
       image:
