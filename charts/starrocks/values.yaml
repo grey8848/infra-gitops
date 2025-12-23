@@ -1,55 +1,64 @@
-starrocksCluster:
-  enabled: true
-  name: sr-kind
-  frontend:
-    replicas: 1   # kind 必须降级
+operator:
+  starrocksOperator:
+    image:
+      # image sliced by "repository:tag"
+      repository: starrocks/operator
+      tag: v1.11.3
+    imagePullPolicy: IfNotPresent
+    replicaCount: 1
     resources:
-      requests:
-        cpu: "1"
-        memory: "2Gi"
       limits:
-        cpu: "2"
-        memory: "4Gi"
-    storage:
-      type: hostPath
-      hostPath:
-        path: /data/starrocks/fe
-
-    service:
-      type: NodePort
-      ports:
-        - name: mysql
-          port: 9030
-          nodePort: 30903
-        - name: http
-          port: 8030
-          nodePort: 30803
-  backend:
+        cpu: 500m
+        memory: 800Mi
+      requests:
+        cpu: 500m
+        memory: 400Mi
+starrocks:
+  starrocksCluster:
+    componentValues:
+      image:
+        tag: "3.5-latest"
+  starrocksFESpec:
+    # number of replicas to deploy for a FE statefulset.
     replicas: 1
-    resources:
-      requests:
-        cpu: "2"
-        memory: "4Gi"
-      limits:
-        cpu: "4"
-        memory: "8Gi"
+    image:
+      # image sliced by "repository:tag"
+      repository: starrocks/fe-ubuntu
+      tag: ""
+    imagePullPolicy: IfNotPresent
+    storageSpec:
+      name: "fe"
+      storageSize: "10Gi"
+      storageClassName: "standard"
+      storageMountPath: /opt/starrocks/fe/meta
+  starrocksCnSpec:
+    image:
+      # image sliced by "repository:tag"
+      repository: starrocks/cn-ubuntu
+      tag: ""
+    imagePullPolicy: IfNotPresent
+    storageSpec:
+      name: fe
+      storageClassName: standard
+      storageSize: 10Gi
+      storageMountPath: /opt/starrocks/fe/meta
+      # 关闭 FE 日志持久化
+      logStorageSize: 0Gi
+  starrocksBeSpec:
+    # number of replicas to deploy.
+    replicas: 1
+    image:
+      # image sliced by "repository:tag"
+      repository: starrocks/be-ubuntu
+      tag: ""
+    imagePullPolicy: IfNotPresent
+    storageSpec:
+      name: be
+      storageClassName: standard
+      storageSize: 100Gi
+      storageCount: 1
+      storageMountPath: /opt/starrocks/be/storage
+      logStorageSize: 0Gi
+      spillStorageSize: 0Gi
 
-    storage:
-      type: hostPath
-      hostPath:
-        path: /data/starrocks/be
-
-    service:
-      type: ClusterIP
-  starrocksConf:
-    fe.conf: |
-      http_port = 8030
-      query_port = 9030
-      enable_authentication = true
-
-    be.conf: |
-      webserver_port = 8040
-      heartbeat_service_port = 9050
-      mem_limit = 70%
-      enable_cgroup_memory_limit = false
 
