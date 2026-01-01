@@ -10,6 +10,16 @@ spec:
   flinkVersion: v1_20
   serviceAccount: flink
 
+  flinkConfiguration:
+    # Disable web UI cancel button to prevent accidental job cancellation
+    web.cancel.enable: false
+    # Configure execution target for Flink operator
+    execution.target: kubernetes-application
+    # Disable job submission via REST API
+    rest.bind-port: 8081
+    # Enable application mode for Flink operator
+    kubernetes.rest-service.exposed.type: ClusterIP
+
   podTemplate:
     spec:
       volumes:
@@ -39,4 +49,5 @@ spec:
     - /opt/flink/pipeline.yaml
     parallelism: {{ .Values.cdc.job.parallelism }}
     upgradeMode: stateless
+    state: running
 {{- end }}
