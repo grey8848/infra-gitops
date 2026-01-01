@@ -16,7 +16,7 @@ sink:
   jdbc-url: {{ .Values.cdc.starrocks.jdbcUrl }}
   load-url: {{ .Values.cdc.starrocks.loadUrl }}
   username: {{ .Values.cdc.starrocks.username }}
-  password: {{ .Values.cdc.starrocks.password }}
+  password: {{ .Values.cdc.starrocks.password | default "" | quote }}
   # 可选：如果目标表不存在，Pipeline 可以自动创建
   table.create.properties.replication_num: 1
 
