@@ -1,6 +1,6 @@
 image:
   repository: local-registry:5000/flink-cdc
-  tag: 1.20.1
+  tag: 1.20.2
 
 resources:
   taskmanager:

@@ -8,7 +8,8 @@
 *.so
 *.dylib
 docker/flinkcdc/flink-cdc-dist-3.5.0.jar
-
+docker/flinkcdc/flink-cdc-pipeline-connector-mysql-3.5.0.jar
+docker/flinkcdc/flink-cdc-pipeline-connector-starrocks-3.5.0.jar
 # Test binary, built with 
 *.test
 
