@@ -21,8 +21,8 @@ cdc:
     database: raw
     table: user
   starrocks:
-    jdbcUrl: jdbc:mysql://kube-starrocks-fe-search.bigdata.cluster.local:9030
-    loadUrl: kube-starrocks-fe-service.bigdata.cluster.local:8030
+    jdbcUrl: jdbc:mysql://kube-starrocks-fe-search.bigdata.svc.cluster.local:9030
+    loadUrl: kube-starrocks-fe-service.bigdata.svc.cluster.local:8030
     database: ods
     table: ods_user_cdc
     username: root
