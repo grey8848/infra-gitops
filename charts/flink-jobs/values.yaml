@@ -2,11 +2,6 @@ image:
   repository: local-registry:5000/flink-orgin
   tag: 1.20.1
 
-# job:
-#   name: flink-demo
-#   jarURI: local:///opt/flink/examples/streaming/WordCount.jar
-#   parallelism: 2
-
 resources:
   taskmanager:
     replicas: 2
