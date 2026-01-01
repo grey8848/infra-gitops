@@ -22,7 +22,6 @@ spec:
     parallelism: {{ .Values.cdc.job.parallelism }}
     args:
       - sql
-      - --file
       - /opt/flink/sql/job.sql
     upgradeMode: stateless
 {{- end }}
