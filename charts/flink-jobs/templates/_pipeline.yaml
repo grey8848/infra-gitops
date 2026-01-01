@@ -1,0 +1,31 @@
+{{- define "pipeline.yaml" -}}
+source:
+  type: mysql
+  hostname: {{ .Values.cdc.mysql.hostname }}
+  port: {{ .Values.cdc.mysql.port }}
+  username: {{ .Values.cdc.mysql.username }}
+  password: {{ .Values.cdc.mysql.password }}
+  # 格式为 'database.table'，支持正则，例如 'mydb.*'
+  tables: {{ .Values.cdc.mysql.database }}.{{ .Values.cdc.mysql.table }}
+  # 强烈建议配置 server-id 范围，避免多并发时冲突
+  server-id: 5400-5404
+
+sink:
+  type: starrocks
+  name: StarRocks Sink
+  jdbc-url: {{ .Values.cdc.starrocks.jdbcUrl }}
+  load-url: {{ .Values.cdc.starrocks.loadUrl }}
+  username: {{ .Values.cdc.starrocks.username }}
+  password: {{ .Values.cdc.starrocks.password }}
+  # 可选：如果目标表不存在，Pipeline 可以自动创建
+  table.create.properties.replication_num: 1
+
+# 路由映射：将源表映射到目标表
+route:
+  - source-table: {{ .Values.cdc.mysql.database }}.{{ .Values.cdc.mysql.table }}
+    sink-table: {{ .Values.cdc.starrocks.database }}.{{ .Values.cdc.starrocks.table }}
+
+pipeline:
+  name: MySQL to StarRocks Sync
+  parallelism: {{ .Values.cdc.job.parallelism }}
+{{- end -}}

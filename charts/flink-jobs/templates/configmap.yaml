@@ -1,0 +1,9 @@
+{{- if .Values.cdc.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.cdc.job.name }}-pipeline-config
+data:
+  pipeline.yaml: |
+{{ include "pipeline.yaml" . | indent 4 }}
+{{- end }}

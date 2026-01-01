@@ -7,21 +7,34 @@ spec:
   image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
   flinkVersion: v1_20
   serviceAccount: flink
+
+  volumes:
+    - name: pipeline-config
+      configMap:
+        name: {{ .Values.cdc.job.name }}-pipeline-config
+
   jobManager:
     resource:
       cpu: 1
       memory: 1g
+    volumeMounts:
+    - name: pipeline-config
+      mountPath: /opt/flink/pipeline.yaml
+      subPath: pipeline.yaml
   taskManager:
     replicas: {{ .Values.resources.taskmanager.replicas }}
     resource:
       cpu: {{ .Values.resources.taskmanager.cpu }}
       memory: {{ .Values.resources.taskmanager.memory }}
+    volumeMounts:
+    - name: pipeline-config
+      mountPath: /opt/flink/pipeline.yaml
+      subPath: pipeline.yaml
   job:
     jarURI: local:///opt/flink/lib/flink-cdc-dist-3.5.0.jar
     entryClass: org.apache.flink.cdc.cli.CliFrontend
-    parallelism: {{ .Values.cdc.job.parallelism }}
     args:
-      - sql
-      - /opt/flink/sql/job.sql
+    - /opt/flink/pipeline.yaml
+    parallelism: {{ .Values.cdc.job.parallelism }}
     upgradeMode: stateless
 {{- end }}
