@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Values.cdc.job.name }}-pipeline-config
+  namespace: flink
 data:
   pipeline.yaml: |
 {{ include "pipeline.yaml" . | indent 4 }}
