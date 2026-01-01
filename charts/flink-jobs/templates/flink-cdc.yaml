@@ -6,6 +6,7 @@ metadata:
   namespace: flink
 spec:
   image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+  imagePullPolicy: Always
   flinkVersion: v1_20
   serviceAccount: flink
 
