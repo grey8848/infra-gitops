@@ -1,25 +1,27 @@
-apiVersion: flink.apache.org/v1beta1
-kind: FlinkDeployment
-metadata:
-  name: {{ .Values.job.name }}
-spec:
-  image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-  flinkVersion: v1_20
+# {{- if .Values.cdc.enabled }}
+# apiVersion: flink.apache.org/v1beta1
+# kind: FlinkDeployment
+# metadata:
+#   name: {{ .Values.job.name }}
+# spec:
+#   image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+#   flinkVersion: v1_20
 
-  serviceAccount: flink
+#   serviceAccount: flink
 
-  jobManager:
-    resource:
-      cpu: 1
-      memory: 1g
+#   jobManager:
+#     resource:
+#       cpu: 1
+#       memory: 1g
 
-  taskManager:
-    replicas: {{ .Values.resources.taskmanager.replicas }}
-    resource:
-      cpu: {{ .Values.resources.taskmanager.cpu }}
-      memory: {{ .Values.resources.taskmanager.memory }}
+#   taskManager:
+#     replicas: {{ .Values.resources.taskmanager.replicas }}
+#     resource:
+#       cpu: {{ .Values.resources.taskmanager.cpu }}
+#       memory: {{ .Values.resources.taskmanager.memory }}
 
-  job:
-    jarURI: {{ .Values.job.jarURI }}
-    parallelism: {{ .Values.job.parallelism }}
-    upgradeMode: stateless
+#   job:
+#     jarURI: {{ .Values.job.jarURI }}
+#     parallelism: {{ .Values.job.parallelism }}
+#     upgradeMode: stateless
+# {{- end }}

@@ -2,13 +2,33 @@ image:
   repository: local-registry:5000/flink-orgin
   tag: 1.20.1
 
-job:
-  name: flink-demo
-  jarURI: local:///opt/flink/examples/streaming/WordCount.jar
-  parallelism: 2
+# job:
+#   name: flink-demo
+#   jarURI: local:///opt/flink/examples/streaming/WordCount.jar
+#   parallelism: 2
 
 resources:
   taskmanager:
     replicas: 2
     cpu: 1
     memory: 2g
+
+cdc:
+  enabled: true
+  job:
+    name: flink-cdc
+    parallelism: 2
+  mysql:
+    hostname: dev-mysql.bigdata.svc.cluster.local
+    port: 3306
+    username: root
+    password: root123456
+    database: raw
+    table: user
+  starrocks:
+    jdbcUrl: jdbc:mysql://kube-starrocks-fe-search.bigdata.cluster.local:9030
+    loadUrl: kube-starrocks-fe-service.bigdata.cluster.local:8030
+    database: ods
+    table: ods_user_cdc
+    username: root
+    password: ""
