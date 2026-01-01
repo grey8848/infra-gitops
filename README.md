@@ -46,4 +46,12 @@ docker exec my-cluster-control-plane ping -c 2 local-registry
 docker exec my-cluster-control-plane curl http://local-registry:5000/v2/_catalog
 # 7. 测试拉取（使用 local-registry:5000）
 docker exec my-cluster-control-plane crictl pull local-registry:5000/traefik:latest
+
 ```
+# 创建临时pod进行网络测试包含crul
+```
+kubectl run netshoot \                                                                                                                                                                                                        49m 39s   dbt
+--rm -it \
+--image=local-registry:5000/nicolaka-netshoot \
+--restart=Never \
+-- bash
