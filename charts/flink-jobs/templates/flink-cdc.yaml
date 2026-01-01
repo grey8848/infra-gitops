@@ -44,6 +44,7 @@ spec:
       memory: {{ .Values.resources.taskmanager.memory }}
   job:
     jarURI: 'file:///opt/flink/lib/flink-cdc-pipeline-connector-mysql-3.5.0.jar'
+    entryClass: org.apache.flink.cdc.cli.CliFrontend
     args:
       - /opt/flink/pipeline.yaml
     parallelism: {{ .Values.cdc.job.parallelism }}
