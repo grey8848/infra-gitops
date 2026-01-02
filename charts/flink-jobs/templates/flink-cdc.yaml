@@ -19,6 +19,7 @@ spec:
     rest.bind-port: 8081
     # Enable application mode for Flink operator
     kubernetes.rest-service.exposed.type: ClusterIP
+    classloader.resolve-order: parent-first
 
   podTemplate:
     spec:
