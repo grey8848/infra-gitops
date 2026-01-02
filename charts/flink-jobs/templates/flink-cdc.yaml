@@ -22,9 +22,6 @@ spec:
     classloader.resolve-order: parent-first
     taskmanager.numberOfTaskSlots: "1"
     execution.checkpointing.interval: "10s"
-    # 关键配置：确保 RPC 端口配置正确
-    jobmanager.rpc.port: "6123"
-    execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
   podTemplate:
     spec:
       volumes:
@@ -56,7 +53,7 @@ spec:
       memory: {{ .Values.resources.taskmanager.memory }}
   job:
     jarURI: 'local:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
-    entryClass: org.apache.flink.kubernetes.entrypoint.KubernetesApplicationClusterEntrypoint
+    entryClass: org.apache.flink.cdc.cli.CliFrontend
     args:
     - --job-classname
     - org.apache.flink.cdc.composer.PipelineExecution
