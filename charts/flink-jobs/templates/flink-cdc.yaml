@@ -20,7 +20,6 @@ spec:
     # Enable application mode for Flink operator
     kubernetes.rest-service.exposed.type: ClusterIP
     classloader.resolve-order: parent-first
-
   podTemplate:
     spec:
       volumes:
@@ -44,11 +43,11 @@ spec:
       cpu: {{ .Values.resources.taskmanager.cpu }}
       memory: {{ .Values.resources.taskmanager.memory }}
   job:
-    jarURI: 'local:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
+    jarURI: 'file:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
     entryClass: org.apache.flink.cdc.cli.CliFrontend
     args:
       - /opt/flink/pipeline.yaml
     parallelism: {{ .Values.cdc.job.parallelism }}
-    upgradeMode: savepoint
+    upgradeMode: stateless
     state: running
 {{- end }}
