@@ -36,7 +36,7 @@ spec:
             /opt/flink/bin/flink run \
               -c org.apache.flink.cdc.cli.CliFrontend \
               /opt/flink/usrlib/flink-cdc-dist-3.5.0.jar \
-              /opt/flink/conf/pipeline.yaml
+              /opt/flink/pipeline.yaml
         volumeMounts:
         - name: pipeline-config
           mountPath: /opt/flink/pipeline.yaml
