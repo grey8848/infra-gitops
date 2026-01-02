@@ -12,6 +12,7 @@ docker/flinkcdc/flink-cdc-pipeline-connector-mysql-3.5.0.jar
 docker/flinkcdc/flink-cdc-pipeline-connector-starrocks-3.5.0.jar
 docker/flinkcdc/mysql-connector-j-8.0.33.jar
 docker/flinkcdc/flink-cdc-common-3.5.0.jar
+docker/flinkcdc/flink-cdc-runtime-3.5.0.jar
 # Test binary, built with 
 *.test
 
