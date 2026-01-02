@@ -55,3 +55,17 @@ kubectl run netshoot \                                                          
 --image=local-registry:5000/nicolaka-netshoot \
 --restart=Never \
 -- bash
+
+```
+-- 手动创建job-mananger
+❯ kubectl exec -it flink-cdc-7d78c44f85-k7rkl -n flink --  \
+  /opt/flink/bin/flink run \
+  -c org.apache.flink.cdc.cli.CliFrontend \
+  /opt/flink/lib/flink-cdc-dist-3.5.0.jar \
+  /opt/flink/pipeline.yaml
+ERROR StatusLogger Reconfiguration failed: No configuration found for '2b71fc7e' at 'null' in 'null'
+Fri Jan 02 10:53:33 UTC 2026 WARN: Establishing SSL connection without server's identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
+Pipeline has been submitted to cluster.
+Job ID: 1c43c01d0ead5a03cddab863397a8cd6
+Job Description: MySQL to StarRocks Sync
+```
