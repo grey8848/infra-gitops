@@ -21,18 +21,41 @@ mysql:
   primary:
     configuration: |-
       [mysqld]
+      authentication_policy='{{- .Values.auth.authenticationPolicy | default "* ,," }}'
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mysql
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+      port={{ .Values.primary.containerPorts.mysql }}
+      mysqlx={{ ternary 1 0 .Values.primary.enableMySQLX }}
+      mysqlx_port={{ .Values.primary.containerPorts.mysqlx }}
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      datadir=/bitnami/mysql/data
+      tmpdir=/opt/bitnami/mysql/tmp
+      max_allowed_packet=16M
+      bind-address=*
+      pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+      log-error=/opt/bitnami/mysql/logs/mysqld.log
+      character-set-server=UTF8
+      slow_query_log=0
+      long_query_time=10.0
       server-id=1
       log_bin=mysql-bin
       binlog_format=ROW
       binlog_row_image=FULL
       expire_logs_days=7
-      skip-name-resolve
-      explicit_defaults_for_timestamp
-      basedir=/opt/bitnami/mysql
-      datadir=/bitnami/mysql/data
-      port=3306
-      bind-address=*
-      character-set-server=UTF8  
+      {{- if .Values.tls.enabled }}
+      ssl_cert=/opt/bitnami/mysql/certs/{{ .Values.tls.certFilename }}
+      ssl_key=/opt/bitnami/mysql/certs/{{ .Values.tls.certKeyFilename }}
+      {{- if (include "mysql.tlsCACert" .) }}
+      ssl_ca={{ include "mysql.tlsCACert" . }}
+      {{- end }}
+      {{- end }}
+      [client]
+      port={{ .Values.primary.containerPorts.mysql }}
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
     # 持久化
     persistence:
       enabled: true
