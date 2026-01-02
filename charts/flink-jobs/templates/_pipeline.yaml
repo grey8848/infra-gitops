@@ -5,11 +5,9 @@ source:
   port: {{ .Values.cdc.mysql.port }}
   username: {{ .Values.cdc.mysql.username }}
   password: {{ .Values.cdc.mysql.password }}
-  # CDC 3.x 必须项
-  database-name: {{ .Values.cdc.mysql.database }}
-  table-name: {{ .Values.cdc.mysql.table }}
+  # 格式为 'database.table'，支持正则，例如 'mydb.*'
+  tables: {{ .Values.cdc.mysql.database }}.{{ .Values.cdc.mysql.table }}
   # 强烈建议配置 server-id 范围，避免多并发时冲突
-  scan.startup.mode: initial
   server-id: 5400-5404
 
 sink:
