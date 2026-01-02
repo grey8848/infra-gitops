@@ -11,12 +11,12 @@ spec:
   serviceAccount: flink
 
   flinkConfiguration:
+     # REST 必须可用（CDC CLI 要用）
+    rest.bind-port: "8081"
     # Disable web UI cancel button to prevent accidental job cancellation
     web.cancel.enable: false
     # Configure execution target for Flink operator
-    execution.target: kubernetes-application
-    # Disable job submission via REST API
-    rest.bind-port: 8081
+    execution.target: kubernetes-session
     # Enable application mode for Flink operator
     kubernetes.rest-service.exposed.type: ClusterIP
     classloader.resolve-order: parent-first
@@ -34,12 +34,6 @@ spec:
         - name: pipeline-config
           mountPath: /opt/flink/pipeline.yaml
           subPath: pipeline.yaml
-        # 添加环境变量以便调试
-        env:
-        - name: FLINK_PROPERTIES
-          value: |
-            jobmanager.rpc.address: {{ .Values.cdc.job.name }}
-            jobmanager.rpc.port: 6123
 
   jobManager:
     replicas: 1
@@ -51,12 +45,12 @@ spec:
     resource:
       cpu: {{ .Values.resources.taskmanager.cpu }}
       memory: {{ .Values.resources.taskmanager.memory }}
-  job:
-    jarURI: 'file:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
-    entryClass: org.apache.flink.cdc.cli.CliFrontend
-    args:
-    - /opt/flink/pipeline.yaml
-    parallelism: {{ .Values.cdc.job.parallelism }}
-    upgradeMode: stateless
-    state: running
+  # job:
+  #   jarURI: 'file:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
+  #   entryClass: org.apache.flink.cdc.cli.CliFrontend
+  #   args:
+  #   - /opt/flink/pipeline.yaml
+  #   parallelism: {{ .Values.cdc.job.parallelism }}
+  #   upgradeMode: stateless
+  #   state: running
 {{- end }}
