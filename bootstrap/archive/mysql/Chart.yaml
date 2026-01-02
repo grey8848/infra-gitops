@@ -8,7 +8,7 @@ dependencies:
   - name: mysql
     # ⚠️ 这里的版本必须和 mysql-14.0.3.tgz 里的 Chart 版本完全一致！
     # 如果压缩包名是 mysql-14.0.3.tgz，通常 version 就是 14.0.3
-    version: "10.3.0.tgz"  
+    version: "14.0.3"  
     # ⚠️ 删除 repository 字段，或者将其留空/设为 file://
     # 当 charts/ 目录下有对应 tgz 时，Helm 会优先使用本地文件
     repository: ""

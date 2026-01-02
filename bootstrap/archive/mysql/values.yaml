@@ -1,10 +1,13 @@
+global:
+  security:
+    allowInsecureImages: true
 # 关键：Wrapper Chart 必须把配置放在依赖名 "mysql" 下面
 mysql:
   # 1. 镜像配置
   image:
     registry: local-registry:5000
-    repository: mysql-debian  # 确保你本地仓库里叫这个名字 (通常是 bitnami/mysql)
-    tag: 8
+    repository: bitnami-mysql  # 确保你本地仓库里叫这个名字 (通常是 bitnami/mysql)
+    tag: 9.4.0
     pullPolicy: IfNotPresent
 
   # 2. 认证信息
@@ -18,14 +21,14 @@ mysql:
   primary:
     configuration: |-
       [mysqld]
-      default_authentication_plugin=mysql_native_password
+      authentication_policy='{{- .Values.auth.authenticationPolicy | default "* ,," }}'
       skip-name-resolve
       explicit_defaults_for_timestamp
       basedir=/opt/bitnami/mysql
       plugin_dir=/opt/bitnami/mysql/lib/plugin
-      port={{ .Values.secondary.containerPorts.mysql }}
-      mysqlx={{ ternary 1 0 .Values.secondary.enableMySQLX }}
-      mysqlx_port={{ .Values.secondary.containerPorts.mysqlx }}
+      port={{ .Values.primary.containerPorts.mysql }}
+      mysqlx={{ ternary 1 0 .Values.primary.enableMySQLX }}
+      mysqlx_port={{ .Values.primary.containerPorts.mysqlx }}
       socket=/opt/bitnami/mysql/tmp/mysql.sock
       datadir=/bitnami/mysql/data
       tmpdir=/opt/bitnami/mysql/tmp
@@ -40,9 +43,16 @@ mysql:
       log_bin=mysql-bin
       binlog_format=ROW
       binlog_row_image=FULL
-      expire_logs_days=7
+      binlog_expire_logs_seconds=604800
+      {{- if .Values.tls.enabled }}
+      ssl_cert=/opt/bitnami/mysql/certs/{{ .Values.tls.certFilename }}
+      ssl_key=/opt/bitnami/mysql/certs/{{ .Values.tls.certKeyFilename }}
+      {{- if (include "mysql.tlsCACert" .) }}
+      ssl_ca={{ include "mysql.tlsCACert" . }}
+      {{- end }}
+      {{- end }}
       [client]
-      port={{ .Values.secondary.containerPorts.mysql }}
+      port={{ .Values.primary.containerPorts.mysql }}
       socket=/opt/bitnami/mysql/tmp/mysql.sock
       default-character-set=UTF8
       plugin_dir=/opt/bitnami/mysql/lib/plugin

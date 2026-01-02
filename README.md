@@ -69,3 +69,25 @@ Pipeline has been submitted to cluster.
 Job ID: 1c43c01d0ead5a03cddab863397a8cd6
 Job Description: MySQL to StarRocks Sync
 ```
+
+```
+CREATE TABLE `order` (
+  `order_id` bigint NOT NULL COMMENT '订单ID',
+  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+  `order_amount` decimal(10,2) DEFAULT NULL COMMENT '订单金额',
+  `order_status` varchar(50) DEFAULT NULL COMMENT '订单状态',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`order_id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='订单表';
+
+CREATE TABLE `user` (
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `user_name` varchar(255) DEFAULT NULL COMMENT '用户名',
+  `gender` varchar(20) DEFAULT NULL COMMENT '性别',
+  `status` varchar(50) DEFAULT NULL COMMENT '用户状态',
+  `register_time` datetime DEFAULT NULL COMMENT '注册时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
