@@ -4,7 +4,7 @@ image:
 
 resources:
   taskmanager:
-    replicas: 2
+    replicas: 1
     cpu: 1
     memory: 4g
 

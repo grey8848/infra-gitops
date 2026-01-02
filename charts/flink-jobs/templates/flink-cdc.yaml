@@ -22,6 +22,8 @@ spec:
     classloader.resolve-order: parent-first
     taskmanager.numberOfTaskSlots: "1"
     execution.checkpointing.interval: "10s"
+    # 关键配置：确保 RPC 端口配置正确
+    jobmanager.rpc.port: "6123"
     execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
   podTemplate:
     spec:
@@ -35,8 +37,15 @@ spec:
         - name: pipeline-config
           mountPath: /opt/flink/pipeline.yaml
           subPath: pipeline.yaml
+        # 添加环境变量以便调试
+        env:
+        - name: FLINK_PROPERTIES
+          value: |
+            jobmanager.rpc.address: {{ .Values.cdc.job.name }}
+            jobmanager.rpc.port: 6123
 
   jobManager:
+    replicas: 1
     resource:
       cpu: 2
       memory: 4g
