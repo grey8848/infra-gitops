@@ -55,8 +55,6 @@ spec:
     jarURI: 'local:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
     entryClass: org.apache.flink.cdc.cli.CliFrontend
     args:
-    - --job-classname
-    - org.apache.flink.cdc.composer.PipelineExecution
     - /opt/flink/pipeline.yaml
     parallelism: {{ .Values.cdc.job.parallelism }}
     upgradeMode: stateless
