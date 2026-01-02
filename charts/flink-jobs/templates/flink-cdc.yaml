@@ -11,8 +11,13 @@ spec:
   serviceAccount: flink
 
   flinkConfiguration:
+    # Disable web UI cancel button to prevent accidental job cancellation
     web.cancel.enable: false
-    execution.target: kubernetes-session
+    # Configure execution target for Flink operator
+    execution.target: kubernetes-application
+    # Disable job submission via REST API
+    rest.bind-port: 8081
+    # Enable application mode for Flink operator
     kubernetes.rest-service.exposed.type: ClusterIP
 
   podTemplate:
@@ -22,20 +27,27 @@ spec:
           configMap:
             name: {{ .Values.cdc.job.name }}-pipeline-config
       containers:
-        - name: flink-main-container
-          volumeMounts:
-            - name: pipeline-config
-              mountPath: /opt/flink/pipeline.yaml
-              subPath: pipeline.yaml
+      - name: flink-main-container
+        volumeMounts:
+        - name: pipeline-config
+          mountPath: /opt/flink/pipeline.yaml
+          subPath: pipeline.yaml
 
   jobManager:
     resource:
       cpu: 2
       memory: 4g
-
   taskManager:
     replicas: {{ .Values.resources.taskmanager.replicas }}
     resource:
       cpu: {{ .Values.resources.taskmanager.cpu }}
       memory: {{ .Values.resources.taskmanager.memory }}
+  job:
+    jarURI: 'file:///opt/flink/lib/flink-cdc-pipeline-connector-mysql-3.5.0.jar'
+    entryClass: org.apache.flink.cdc.cli.CliFrontend
+    args:
+      - /opt/flink/pipeline.yaml
+    parallelism: {{ .Values.cdc.job.parallelism }}
+    upgradeMode: stateless
+    state: running
 {{- end }}
