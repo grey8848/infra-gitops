@@ -43,7 +43,7 @@ spec:
       cpu: {{ .Values.resources.taskmanager.cpu }}
       memory: {{ .Values.resources.taskmanager.memory }}
   job:
-    jarURI: 'file:///opt/flink/usrlib/flink-cdc-dist-3.5.0.jar'
+    jarURI: 'file:///opt/flink/lib/flink-cdc-dist-3.5.0.jar'
     entryClass: org.apache.flink.cdc.cli.CliFrontend
     args:
       - /opt/flink/pipeline.yaml
