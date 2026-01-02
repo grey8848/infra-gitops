@@ -6,7 +6,7 @@ resources:
   taskmanager:
     replicas: 2
     cpu: 1
-    memory: 2g
+    memory: 4g
 
 cdc:
   enabled: true
