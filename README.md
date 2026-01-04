@@ -57,7 +57,7 @@ kubectl run netshoot \                                                          
 -- bash
 
 ```
--- 手动创建job-mananger
+-- 手动创建job-mananger 这个步骤要确定 的是
 ❯ kubectl exec -it flink-cdc-7d78c44f85-k7rkl -n flink --  \
   /opt/flink/bin/flink run \
   -c org.apache.flink.cdc.cli.CliFrontend \
