@@ -91,3 +91,9 @@ CREATE TABLE `user` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
+
+
+fedora
+systemd-run --scope --user -p "Delegate=yes" \
+  env KIND_EXPERIMENTAL_PROVIDER=podman \
+  kind create cluster --name fpg --config kind-config.yaml
