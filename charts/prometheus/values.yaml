@@ -13,6 +13,9 @@ kube-prometheus-stack:
                 storage: 50Gi
   crds:
     enabled: true
+  prometheusOperator:
+    admissionWebhooks:
+      enabled: false
   alertmanager:
     enabled: true
     config:
