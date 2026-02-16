@@ -12,7 +12,7 @@ kube-prometheus-stack:
               requests:
                 storage: 50Gi
   crds:
-    enabled: false
+    enabled: true
   alertmanager:
     enabled: true
     config:
