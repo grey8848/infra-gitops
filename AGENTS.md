@@ -1,33 +1,75 @@
-# Repository Guidelines
+# PROJECT KNOWLEDGE BASE
 
-## Project Structure & Module Organization
-- `charts/<app>/` contains wrapper Helm charts that mirror Bitnami dependencies; each chart is named `wrapper-<app>` and keeps its own `values.yaml`.
-- `environments/{dev,prod}` holds `<app>-values.yaml` overrides—only items that differ from the defaults should live here.
-- `bootstrap/` stores ArgoCD manifests: `argocd-apps/{env}-{app}.yaml` targets the corresponding chart and values file, and `root-app.yaml` wires the App-of-Apps.
-- Run `bash init_gitops_infra.sh` to regenerate the charts, values, and ArgoCD manifests when you add services or change repo metadata; the script echoes next steps too.
+**Generated:** 2026-03-15T22:39:39+08:00
+**Commit:** 57ef642
+**Branch:** main
 
-## Build, Test, and Development Commands
-- `bash init_gitops_infra.sh` regenerates charts, environments, and ArgoCD files after structural changes; finish by pointing the generated manifests at your repo.
-- Connect the local registry to Kind (`docker network connect kind local-registry`) and curl `local-registry:5000/v2/_catalog` after identifying the container via `docker ps | grep registry`.
-- `kubectl apply -f bootstrap/root-app.yaml` triggers the App-of-Apps sync once ArgoCD is running; monitor with `kubectl get applications.argoproj.io -n argocd`.
-- `kubectl run netshoot --rm -it --image=local-registry:5000/nicolaka-netshoot --restart=Never -- bash` offers a quick in-cluster connectivity check.
+## OVERVIEW
+GitOps infrastructure repo: Helm charts (wrapper + a few custom charts) deployed via ArgoCD (App-of-Apps) with per-environment values overlays.
 
-## Coding Style & Naming Conventions
-- YAML in `charts/` and `bootstrap/` uses two-space indentation and explicit `metadata.name` values such as `dev-kafka`.
-- Helm wrapper charts keep the `wrapper-` prefix and defer overrides to the environment-specific files under `environments/{env}/{app}-values.yaml`.
-- Keep shell snippets simple and echo-driven (as in `init_gitops_infra.sh`); document manual steps only when new scripts arrive.
+## STRUCTURE
+```
+infra-gitops/
+├── bootstrap/                # ArgoCD Applications + root App-of-Apps
+├── charts/                   # Helm charts (wrapper-* + custom charts)
+├── environments/{dev,prod}/  # Values overlays: *-values.yaml (deltas only)
+├── docker/                   # Local dev utilities (nacos via podman-compose, flinkcdc image inputs)
+├── rbac/                     # Optional RBAC manifests
+├── storage/                  # Optional manual PV/PVC manifests (kind hostPath)
+├── init_gitops_infra.sh      # Generator/scaffold script
+├── kind-config.yaml          # Kind cluster config
+└── kind-with-proxy.sh        # Inject proxy + registry config into kind node
+```
 
-## Testing Guidelines
-- No automated CI tests exist yet; use `helm install --dry-run --debug charts/<app> --values environments/dev/<app>-values.yaml` before applying.
-- After syncing, confirm `kubectl get pods -n <env>-infra` and `kubectl describe application <env>-<app> -n argocd` to be sure the app reconciles.
-- Document your verification steps in the PR whenever you touch bootstrap or environment manifests.
+## WHERE TO LOOK
+| Task | Location | Notes |
+|------|----------|-------|
+| Add a new service | `charts/<svc>/`, `environments/{dev,prod}/<svc>-values.yaml`, `bootstrap/argocd-apps/{env}/` | Keep overlays as deltas only. |
+| Bump a chart dependency version | `charts/<svc>/Chart.yaml` | Wrapper charts are named `wrapper-<svc>` in `Chart.yaml`. |
+| Change dev/prod sizing | `environments/dev/*-values.yaml`, `environments/prod/*-values.yaml` | Avoid copying full values; only overrides. |
+| Fix ArgoCD sync / app wiring | `bootstrap/root-*.yaml`, `bootstrap/argocd-apps/**.yaml` | `repoURL` placeholders/TODOs can block sync. |
+| Validate a change locally | `helm ... --dry-run --debug` + `kubectl describe application ...` | No CI in this repo; manual verification is expected. |
+| Local registry + kind networking | `README.md` + `kind-config.yaml` | Registry is referenced as `local-registry:5000`. |
+| Flink CDC job (custom chart) | `charts/flink-jobs/` | Contains FlinkDeployment templates and CDC config. |
+| Manual PV/PVC for kind hostPath | `storage/*.yaml` | Uses `hostPath` (kind node filesystem). |
+| Flink RBAC | `rbac/flink-rbac.yaml` | Role/RoleBinding for `ServiceAccount/flink`. |
 
-## Commit & Pull Request Guidelines
-- Keep commit subjects short and service-specific (e.g., `flink: adjust prod replicas`) to match the existing history.
-- Add a short body only when the change is complex or requires manual verification notes.
-- PRs should state the target environment(s), list the affected charts/values, and summarize any local verification.
+## CONVENTIONS
+- YAML is 2-space indented (especially under `charts/` and `bootstrap/`).
+- ArgoCD Application naming is `{env}-{app}` (e.g. `dev-kafka`), and namespaces are environment-specific (e.g. `prod-infra`, plus some dev app namespaces like `bigdata`, `flink`, `monitoring`).
+- Values layering (in ArgoCD apps): `values.yaml` then `../../environments/<env>/<app>-values.yaml` (later wins).
+- Prefer changing environment-specific sizing/HA in `environments/` instead of editing large “defaults” files under charts.
 
-## Deployment & Configuration Tips
-- Use `kind-config.yaml` (or `kind-with-proxy.sh` when using proxies) to mirror production networking in a local Kind cluster.
-- Update every ArgoCD manifest’s `repoURL` to your repo/branch before running `kubectl apply -f bootstrap/root-app.yaml`.
-- When adding a new service: create a wrapper chart, add per-env overrides, and reference them from `bootstrap/argocd-apps`.
+## ANTI-PATTERNS (THIS PROJECT)
+- Do not apply `bootstrap/` manifests before updating `repoURL` placeholders/TODOs (notably under `bootstrap/argocd-apps/prod/`).
+- Do not commit secrets (e.g. `.env` files, tokens). Use templates/examples + external secrets mechanisms.
+- Do not commit runtime data/logs from `docker/nacos/` (`data/`, `logs/`, `.env.nacos`).
+- Avoid hardcoding production passwords in `values.yaml` (see `charts/flink-jobs/skill.md` guidance).
+- Avoid editing huge upstream/vendor manifests by hand (e.g. `charts/argo/install.yaml` is enormous); prefer replacing from upstream if upgrading.
+
+## COMMANDS
+```bash
+# Regenerate scaffolded structure (overwrites generated files)
+bash init_gitops_infra.sh
+
+# Helm sanity check (no cluster required)
+helm template charts/<app> --values environments/dev/<app>-values.yaml
+
+# Helm install simulation (requires kubeconfig)
+helm install --dry-run --debug <app>-dry-run charts/<app> \
+  --values environments/dev/<app>-values.yaml \
+  --namespace <env>-infra
+
+# Bootstrap ArgoCD App-of-Apps
+kubectl apply -f bootstrap/root-app.yaml   # or root-dev.yaml / root-prod.yaml
+kubectl get applications.argoproj.io -n argocd
+kubectl describe application <env>-<app> -n argocd
+
+# In-cluster connectivity probe
+kubectl run netshoot --rm -it --image=local-registry:5000/nicolaka-netshoot --restart=Never -- bash
+```
+
+## NOTES
+- `bootstrap/root-app.yaml` points ArgoCD at `bootstrap/argocd-apps/` with `recurse: true` (App-of-Apps).
+- Several dev app manifests still include `# TODO: 修改为你的 Git 地址` even when `repoURL` is already filled; prod manifests still include placeholder URLs.
+- `environments/dev/kafka-values.yaml` is intentionally empty in this snapshot; chart defaults apply.
